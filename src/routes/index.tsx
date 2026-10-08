@@ -29,14 +29,33 @@ const FEATURES = [
 
 function Index() {
   const [introComplete, setIntroComplete] = useState(false);
+  const reduce = useReducedMotion();
   const finishIntro = useCallback(() => setIntroComplete(true), []);
   return (
     <>
     {!introComplete && (
-      <section className="flex min-h-svh flex-col items-center justify-center bg-background px-8 py-12" aria-label="CampusOne intro">
-        <LogoAssemble onComplete={finishIntro} className="w-full max-w-[360px]" />
-        <h1 className="mt-10 text-center text-2xl font-semibold">CampusOne</h1>
-        <p className="mt-2 text-center text-sm text-muted-foreground">AI Workplace Productivity Assistant</p>
+      <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-navy px-8 py-12" aria-label="CampusOne intro">
+        {!reduce && (
+          <>
+            <video
+              src={introVideo.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+              ref={(el) => { el.muted = true; }}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-navy/70" aria-hidden="true" />
+          </>
+        )}
+        <div className="relative z-10 flex flex-col items-center">
+          <LogoAssemble onComplete={finishIntro} className="w-full max-w-[360px]" />
+          <h1 className="mt-10 text-center text-2xl font-semibold text-primary-foreground">CampusOne</h1>
+          <p className="mt-2 text-center text-sm text-primary-foreground/80">AI Workplace Productivity Assistant</p>
+        </div>
       </section>
     )}
     <div hidden={!introComplete}>
