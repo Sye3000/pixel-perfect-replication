@@ -11,13 +11,13 @@ import wordmark from "@/assets/logo/wordmark.png";
 // Pieces are pixel-exact layers cut from the supplied CampusOne artwork (same canvas, so
 // they line up perfectly at x/y = 0). Scatter offsets are % of the logo box.
 const PIECES = [
-  { src: ground, x: -30, y: 40, r: -14, z: -60 },
+  { src: ground, x: -24, y: 22, r: -14, z: -60 },
   { src: tent, x: -18, y: -22, r: -10, z: 40, tent: true },
   { src: protractor, x: -40, y: 10, r: 28, z: 90 },
   { src: diamonds, x: 34, y: -30, r: -22, z: 120 },
   { src: campus, x: 38, y: 6, r: 18, z: 70 },
   { src: one, x: 26, y: 34, r: -16, z: 100 },
-  { src: wordmark, x: 8, y: 52, r: 8, z: 30 },
+  { src: wordmark, x: 8, y: 26, r: 8, z: 30 },
 ];
 
 export function LogoAssemble({ onComplete, className = "" }: { onComplete?: () => void; className?: string }) {
