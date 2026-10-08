@@ -80,6 +80,9 @@
   --sidebar-ring: oklch(0.72 0.19 50);
   --shadow-card: 0 1px 2px oklch(0.28 0.075 260 / 6%), 0 8px 24px -12px oklch(0.28 0.075 260 / 18%);
   --shadow-glow: 0 0 0 1px oklch(0.72 0.19 50 / 30%), 0 12px 40px -10px oklch(0.72 0.19 50 / 45%);
+  --logo-depth: oklch(0.22 0.065 260 / 45%);
+  --logo-shadow: oklch(0.28 0.075 260 / 16%);
+  --logo-lock-glow: oklch(0.72 0.19 50 / 24%);
 }
 
 .dark {
@@ -116,3 +119,17 @@
 
 @utility shadow-card { box-shadow: var(--shadow-card); }
 @utility shadow-glow { box-shadow: var(--shadow-glow); }
+
+.campusone-logo { perspective: 900px; }
+.campusone-logo-scene { transform-style: preserve-3d; }
+.campusone-logo-artwork { filter: drop-shadow(0 14px 12px var(--logo-shadow)); }
+.campusone-tent-depth { filter: drop-shadow(1px 2px 0 var(--logo-depth)); }
+.campusone-logo-locked { animation: campusone-lock 650ms ease-out both; }
+@keyframes campusone-lock {
+  0%, 100% { filter: drop-shadow(0 14px 12px var(--logo-shadow)); }
+  40% { filter: drop-shadow(0 14px 12px var(--logo-shadow)) drop-shadow(0 0 8px var(--logo-lock-glow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campusone-logo-scene, .campusone-logo-artwork g { transform: none !important; }
+  .campusone-logo-locked { animation: none; }
+}

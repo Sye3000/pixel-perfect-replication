@@ -1,134 +1,95 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import tent from "@/assets/logo/tent.png";
-import ground from "@/assets/logo/ground.png";
-import protractor from "@/assets/logo/protractor.png";
-import diamonds from "@/assets/logo/diamonds.png";
-import campus from "@/assets/logo/campus.png";
-import one from "@/assets/logo/one.png";
-import wordmark from "@/assets/logo/wordmark.png";
+import { Button } from "@/components/ui/button";
+import { CAMPUSONE_PIECES, CampusOneArtwork } from "@/components/CampusOneArtwork";
 
-// Pieces are pixel-exact layers cut from the supplied CampusOne artwork (same canvas, so
-// they line up perfectly at x/y = 0). Scatter offsets are % of the logo box.
-const PIECES = [
-  { src: ground, x: -24, y: 22, r: -14, z: -60 },
-  { src: tent, x: -18, y: -22, r: -10, z: 40, tent: true },
-  { src: protractor, x: -40, y: 10, r: 28, z: 90 },
-  { src: diamonds, x: 34, y: -30, r: -22, z: 120 },
-  { src: campus, x: 38, y: 6, r: 18, z: 70 },
-  { src: one, x: 26, y: 34, r: -16, z: 100 },
-  { src: wordmark, x: 8, y: 26, r: 8, z: 30 },
-];
+type Phase = "scattered" | "assembling" | "assembled";
+type LogoAssembleProps = {
+  onComplete?: () => void;
+  className?: string;
+  startAssembled?: boolean;
+};
 
-export function LogoAssemble({ onComplete, className = "" }: { onComplete?: () => void; className?: string }) {
+export function LogoAssemble({ onComplete, className = "", startAssembled = false }: LogoAssembleProps) {
   const reduce = useReducedMotion();
-  const [assembled, setAssembled] = useState(false);
-  const [glow, setGlow] = useState(false);
+  const [phase, setPhase] = useState<Phase>(startAssembled ? "assembled" : "scattered");
+  const [locked, setLocked] = useState(false);
+  const [run, setRun] = useState(0);
+  const complete = useRef(onComplete);
+  complete.current = onComplete;
+  const isAssembled = Boolean(reduce) || phase !== "scattered";
 
   useEffect(() => {
     if (reduce) {
-      setAssembled(true);
-      onComplete?.();
+      setPhase("assembled");
+      complete.current?.();
     }
-  }, [reduce]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
-  const toggle = () => {
-    if (reduce) return;
-    const next = !assembled;
-    setAssembled(next);
-    setGlow(false);
-    if (next) {
-      setTimeout(() => {
-        setGlow(true);
-        onComplete?.();
-      }, 900);
-    }
+  useEffect(() => {
+    if (phase !== "assembling" || reduce) return;
+    const lock = window.setTimeout(() => setLocked(true), 2700);
+    const finish = window.setTimeout(() => {
+      setPhase("assembled");
+      complete.current?.();
+    }, 3000);
+    return () => { window.clearTimeout(lock); window.clearTimeout(finish); };
+  }, [phase, reduce]);
+
+  // Replay returns to the scattered pose, then assembles without requiring another tap.
+  useEffect(() => {
+    if (!run || phase !== "scattered" || reduce) return;
+    const replay = window.setTimeout(() => setPhase("assembling"), 450);
+    return () => window.clearTimeout(replay);
+  }, [run, phase, reduce]);
+
+  const play = () => {
+    if (reduce || phase === "assembling") return;
+    setLocked(false);
+    if (phase === "assembled") {
+      setRun(value => value + 1);
+      setPhase("scattered");
+    } else setPhase("assembling");
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
       type="button"
-      onClick={toggle}
-      aria-label={assembled ? "Replay CampusOne logo animation" : "Tap to assemble the CampusOne logo"}
-      className={`group relative flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl ${className}`}
-      style={{ perspective: 900 }}
+      onClick={play}
+      aria-label={isAssembled ? "Replay CampusOne logo animation" : "Tap to assemble the CampusOne logo"}
+      aria-busy={phase === "assembling"}
+      data-phase={reduce ? "assembled" : phase}
+      className={`campusone-logo group relative flex h-auto flex-col gap-0 whitespace-normal p-0 hover:bg-transparent [&_svg]:size-auto ${className}`}
     >
       <motion.div
-        className="relative aspect-[1600/1533] w-full"
-        style={{ transformStyle: "preserve-3d" }}
-        animate={
-          assembled
-            ? { rotateX: 0, rotateY: 0, scale: glow ? [1, 1.04, 1] : 1 }
-            : { rotateX: 14, rotateY: -12, scale: 0.92 }
-        }
-        transition={{ type: "spring", stiffness: 120, damping: 14 }}
+        className="campusone-logo-scene relative aspect-[4/3] w-full"
+        animate={reduce ? { rotateX: 0, rotateY: 0, scale: 1 } : { rotateX: isAssembled ? 0 : 6, rotateY: isAssembled ? 0 : -6, scale: locked ? [1, 1.018, 1] : 1 }}
+        transition={{ rotateX: { duration: 2.4 }, rotateY: { duration: 2.4 }, scale: { type: "tween", duration: 0.3, ease: "easeOut" } }}
       >
-        {PIECES.map((p, i) => (
-          <motion.div
-            key={i}
-            className="absolute inset-0"
-            initial={false}
-            animate={
-              assembled
-                ? { x: "0%", y: "0%", rotate: 0, z: 0, opacity: 1 }
-                : {
-                    x: `${p.x}%`,
-                    y: [`${p.y}%`, `${p.y - 3}%`, `${p.y}%`],
-                    rotate: p.r,
-                    z: p.z,
-                    opacity: 0.95,
-                  }
-            }
-            transition={
-              assembled
-                ? { type: "spring", stiffness: 170, damping: 16, delay: i * 0.06 }
-                : {
-                    y: { duration: 2.4 + i * 0.3, repeat: Infinity, ease: "easeInOut" },
-                    default: { type: "spring", stiffness: 80, damping: 12 },
-                  }
-            }
-          >
-            <img
-              src={p.src}
-              alt=""
-              draggable={false}
-              className="h-full w-full select-none"
-              style={
-                p.tent
-                  ? {
-                      filter:
-                        "drop-shadow(3px 3px 0 oklch(0.2 0.06 260)) drop-shadow(6px 6px 0 oklch(0.16 0.05 260)) drop-shadow(10px 14px 14px oklch(0.2 0.06 260 / 35%))",
-                    }
-                  : undefined
-              }
-            />
-          </motion.div>
-        ))}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-[10%] -z-10 rounded-full bg-brand/30 blur-3xl"
-          animate={{ opacity: glow ? [0, 0.9, 0.35] : 0 }}
-          transition={{ duration: 1.2 }}
-        />
+        <motion.svg xmlns="http://www.w3.org/2000/svg" viewBox="100 30 480 360" className={`campusone-logo-artwork h-full w-full overflow-visible ${locked && !reduce ? "campusone-logo-locked" : ""}`} aria-hidden="true">
+          {CAMPUSONE_PIECES.map((piece, index) => (
+            <motion.g
+              key={piece.id}
+              className={piece.id === "tent" ? "campusone-tent-depth" : undefined}
+              initial={false}
+              animate={isAssembled ? { x: 0, y: 0, rotate: 0 } : { x: piece.x, y: [piece.y, piece.y - 3, piece.y], rotate: piece.rotate }}
+              transition={reduce ? { duration: 0 } : isAssembled
+                ? { type: "spring", duration: 2.1, bounce: 0.12, delay: index * 0.09 }
+                : { x: { type: "spring", duration: 0.4 }, rotate: { type: "spring", duration: 0.4 }, y: { type: "tween", duration: 2.8 + index * 0.15, repeat: Infinity, ease: "easeInOut" } }}
+            >
+              {piece.artwork}
+            </motion.g>
+          ))}
+        </motion.svg>
       </motion.div>
-      <span className="sr-only">CampusOne</span>
-      <motion.span
-        className="mt-4 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground"
-        animate={{ opacity: assembled ? 0.6 : [0.6, 1, 0.6] }}
-        transition={{ duration: 1.8, repeat: assembled ? 0 : Infinity }}
-      >
-        {assembled ? "Tap to replay" : "Tap to assemble"}
-      </motion.span>
-    </button>
+      <span className="mt-6 block h-5 text-sm font-medium text-muted-foreground" aria-live="polite">
+        {reduce ? "CampusOne" : phase === "scattered" ? "Tap to assemble" : phase === "assembling" ? "Assembling…" : "Tap to replay"}
+      </span>
+    </Button>
   );
 }
 
 export function LogoStatic({ className = "" }: { className?: string }) {
-  return (
-    <div className={`relative aspect-[1600/1533] ${className}`} role="img" aria-label="CampusOne">
-      {[ground, tent, protractor, diamonds, campus, one, wordmark].map((s, i) => (
-        <img key={i} src={s} alt="" className="absolute inset-0 h-full w-full" />
-      ))}
-    </div>
-  );
+  return <CampusOneArtwork className={className} />;
 }

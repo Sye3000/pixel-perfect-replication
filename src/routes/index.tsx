@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useState } from "react";
 import { ArrowRight, BookOpenText, ListChecks, Mail } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LogoAssemble } from "@/components/LogoAssemble";
@@ -23,7 +24,18 @@ const FEATURES = [
 ] as const;
 
 function Index() {
+  const [introComplete, setIntroComplete] = useState(false);
+  const finishIntro = useCallback(() => setIntroComplete(true), []);
   return (
+    <>
+    {!introComplete && (
+      <section className="flex min-h-svh flex-col items-center justify-center bg-background px-8 py-12" aria-label="CampusOne intro">
+        <LogoAssemble onComplete={finishIntro} className="w-full max-w-[360px]" />
+        <h1 className="mt-10 text-center text-2xl font-semibold">CampusOne</h1>
+        <p className="mt-2 text-center text-sm text-muted-foreground">AI Workplace Productivity Assistant</p>
+      </section>
+    )}
+    <div hidden={!introComplete}>
     <AppShell title="Dashboard">
       <section className="grid items-center gap-8 rounded-3xl border bg-card p-6 shadow-card sm:p-10 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="min-w-0">
@@ -40,7 +52,7 @@ function Index() {
             Start with an email <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <LogoAssemble className="mx-auto w-full max-w-[280px]" />
+        <LogoAssemble startAssembled className="mx-auto w-full max-w-[280px]" />
       </section>
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,5 +72,7 @@ function Index() {
 
       <div className="mt-8"><Disclaimer /></div>
     </AppShell>
+    </div>
+    </>
   );
 }
