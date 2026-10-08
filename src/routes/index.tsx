@@ -45,7 +45,7 @@ function Index() {
               playsInline
               preload="auto"
               aria-hidden="true"
-              ref={(el) => { el.muted = true; }}
+              ref={(el) => { if (el) el.muted = true; }}
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-navy/70" aria-hidden="true" />
