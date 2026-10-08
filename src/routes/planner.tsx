@@ -13,6 +13,8 @@ export const Route = createFileRoute("/planner")({
       { name: "description", content: "Turn your task list into a prioritised daily or weekly plan by urgency, importance and deadline." },
       { property: "og:title", content: "AI Task Planner — CampusOne AI" },
       { property: "og:description", content: "Prioritised daily and weekly plans based on urgency, importance and deadlines." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PlannerPage,

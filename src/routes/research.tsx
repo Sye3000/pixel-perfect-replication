@@ -12,6 +12,8 @@ export const Route = createFileRoute("/research")({
       { name: "description", content: "Summarise topics, extract key insights, get recommendations and simplify complex information." },
       { property: "og:title", content: "AI Research Assistant — CampusOne AI" },
       { property: "og:description", content: "Summaries, key insights and plain-language explanations in seconds." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ResearchPage,
