@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import { ArrowRight, BookOpenText, ListChecks, Mail } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LogoAssemble } from "@/components/LogoAssemble";
 import { Disclaimer } from "@/components/OutputPanel";
+import introVideo from "@/assets/campusone-intro.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
