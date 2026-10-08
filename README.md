@@ -12,7 +12,7 @@ The project was developed as part of the **CAPACITI AI Skills Accelerator** proj
 
 **Live Application:** [Open CampusOne AI Workplace Productivity Assistant](https://pixel-perfect-studio-475.lovable.app/)
 
-**GitHub Repository:** [View Source Code](YOUR-GITHUB-REPOSITORY-URL-HERE)
+**GitHub Repository:** [View Source Code](https://github.com/Sye3000/pixel-perfect-replication.git)
 
 ---
 
