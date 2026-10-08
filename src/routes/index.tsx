@@ -12,6 +12,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Write emails, plan your tasks and research faster with CampusOne's AI workplace assistant." },
       { property: "og:title", content: "CampusOne AI Workplace Productivity Assistant" },
       { property: "og:description", content: "Smart emails, prioritised plans and research summaries — reviewed by you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

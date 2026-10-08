@@ -13,6 +13,8 @@ export const Route = createFileRoute("/email")({
       { name: "description", content: "Generate professional formal, informal or persuasive emails for any audience." },
       { property: "og:title", content: "Smart Email Generator — CampusOne AI" },
       { property: "og:description", content: "Generate professional emails with audience and tone options." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: EmailPage,
